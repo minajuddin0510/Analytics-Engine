@@ -1,4 +1,4 @@
-// Hardcoded Delta Exchange-style system values for BTC option selling.
+// Hardcoded Delta Exchange-style system values for crypto option selling.
 const CONFIG = Object.freeze({
   lotSizeBtc: 0.001,
   makerFeeRate: 0.0001,
@@ -7,7 +7,35 @@ const CONFIG = Object.freeze({
   defaultTargetRoi: 0.05,
 });
 
+const ASSET_CONFIG = Object.freeze({
+  btc: {
+    key: 'btc',
+    symbol: 'BTC',
+    label: 'Bitcoin',
+    title: 'BTC Options Profit Analytics Engine',
+    eyebrow: 'Delta Exchange BTC Options',
+    priceLabel: 'BTC Price',
+    lotSizeLabel: '0.001 BTC',
+    defaultPrice: 100000,
+    pageTitle: 'BTC Options Profit Analytics Engine',
+    reportTitle: 'BTC Options Profit Analytics Report',
+  },
+  eth: {
+    key: 'eth',
+    symbol: 'ETH',
+    label: 'Ethereum',
+    title: 'ETH Options Profit Analytics Engine',
+    eyebrow: 'Delta Exchange ETH Options',
+    priceLabel: 'ETH Price',
+    lotSizeLabel: '0.001 ETH',
+    defaultPrice: 3000,
+    pageTitle: 'ETH Options Profit Analytics Engine',
+    reportTitle: 'ETH Options Profit Analytics Report',
+  },
+});
+
 const state = {
+  asset: 'btc',
   targetRoi: CONFIG.defaultTargetRoi,
   hydrated: false,
 };
@@ -25,9 +53,16 @@ const elements = {
   copyJournalBtnSecondary: document.getElementById('copyJournalBtnSecondary'),
   exportPdfBtn: document.getElementById('exportPdfBtn'),
   exportCsvBtn: document.getElementById('exportCsvBtn'),
+  assetToggleButtons: document.querySelectorAll('[data-asset]'),
   targetButtons: document.querySelectorAll('[data-target-roi]'),
   statusMessage: document.getElementById('statusMessage'),
   roiBadge: document.getElementById('roiBadge'),
+  assetEyebrow: document.getElementById('assetEyebrow'),
+  assetTitle: document.getElementById('assetTitle'),
+  heroSubtitle: document.getElementById('heroSubtitle'),
+  assetPriceLabel: document.getElementById('assetPriceLabel'),
+  lotSizeValue: document.getElementById('lotSizeValue'),
+  aboutProjectIntro: document.getElementById('aboutProjectIntro'),
   grossProfit: document.getElementById('grossProfit'),
   entryFee: document.getElementById('entryFee'),
   exitFee: document.getElementById('exitFee'),
@@ -52,6 +87,69 @@ const elements = {
   capitalEfficiency: document.getElementById('capitalEfficiency'),
   premiumDecayCaptured: document.getElementById('premiumDecayCaptured'),
 };
+
+function getAssetConfig(assetKey = state.asset) {
+  return ASSET_CONFIG[assetKey] ?? ASSET_CONFIG.btc;
+}
+
+function getAssetPriceValue(assetKey = state.asset) {
+  return getAssetConfig(assetKey).defaultPrice;
+}
+
+function setActiveAssetButton(assetKey) {
+  const activeAsset = getAssetConfig(assetKey).key;
+
+  elements.assetToggleButtons.forEach((button) => {
+    const isActive = button.dataset.asset === activeAsset;
+    button.classList.toggle('active', isActive);
+    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  });
+}
+
+function updateAssetCopy() {
+  const asset = getAssetConfig();
+
+  if (elements.assetEyebrow) {
+    elements.assetEyebrow.textContent = asset.eyebrow;
+  }
+
+  if (elements.assetTitle) {
+    elements.assetTitle.textContent = asset.title;
+  }
+
+  if (elements.heroSubtitle) {
+    elements.heroSubtitle.textContent = 'Professional analytics engine for crypto option sellers featuring exchange fee modelling, GST calculations, ROI targeting, buyback optimization, and profitability analysis.';
+  }
+
+  if (elements.assetPriceLabel) {
+    elements.assetPriceLabel.textContent = asset.priceLabel;
+  }
+
+  if (elements.lotSizeValue) {
+    elements.lotSizeValue.textContent = asset.lotSizeLabel;
+  }
+
+  if (elements.aboutProjectIntro) {
+    elements.aboutProjectIntro.textContent = 'This application recreates Delta Exchange crypto option fee calculations and provides real-time profit analytics for option sellers.';
+  }
+
+  document.title = asset.pageTitle;
+}
+
+function setAsset(assetKey, options = {}) {
+  const nextAsset = getAssetConfig(assetKey).key;
+  const previousAsset = getAssetConfig(state.asset);
+  const currentPrice = parseValue(elements.btcPrice.value);
+  const shouldResetPrice = !Number.isFinite(currentPrice) || currentPrice === previousAsset.defaultPrice;
+
+  state.asset = nextAsset;
+  setActiveAssetButton(nextAsset);
+  updateAssetCopy();
+
+  if (options.resetPrice !== false && shouldResetPrice) {
+    elements.btcPrice.value = String(getAssetPriceValue(nextAsset));
+  }
+}
 
 const formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -308,8 +406,10 @@ function buildEntryExitFormula(price, breakdown) {
 }
 
 function formatTradeJournal(trade, stateSnapshot, summary, targetBuyback) {
+  const asset = getAssetConfig();
+
   return [
-    'BTC Price:',
+    `${asset.priceLabel}:`,
     `${formatMoney(stateSnapshot.btcPrice)}`,
     'Selling Price:',
     `${formatMoney(stateSnapshot.sellingPrice)}`,
@@ -332,14 +432,16 @@ function formatTradeJournal(trade, stateSnapshot, summary, targetBuyback) {
     `Target Net ROI: ${getTargetLabel(state.targetRoi)}`,
     `Target Buyback: ${targetBuyback == null ? 'Not achievable' : formatMoney(targetBuyback)}`,
     '',
-    'Generated by BTC Option Selling Net Profit Calculator',
+    `Generated by ${asset.title}`,
   ].join('\n');
 }
 
 function buildCsvRows(stateSnapshot, summary, targetBuyback, tradeSummary) {
+  const asset = getAssetConfig();
+
   return [
     ['Metric', 'Value'],
-    ['BTC Price', formatMoney(stateSnapshot.btcPrice)],
+    [asset.priceLabel, formatMoney(stateSnapshot.btcPrice)],
     ['Selling Price', formatMoney(stateSnapshot.sellingPrice)],
     ['Buyback Price', stateSnapshot.buyingPrice == null ? 'Enter buyback price' : formatMoney(stateSnapshot.buyingPrice)],
     ['Lots', String(stateSnapshot.lots)],
@@ -364,7 +466,8 @@ function buildCsvRows(stateSnapshot, summary, targetBuyback, tradeSummary) {
 }
 
 function buildPdfReport(stateSnapshot, summary, tradeSummary, targetBuyback) {
-  const reportTitle = 'BTC Options Profit Analytics Report';
+  const asset = getAssetConfig();
+  const reportTitle = asset.reportTitle;
   const rows = [
     ['Capital Used', tradeSummary.capitalUsed],
     ['Gross Profit', summary.grossProfit],
@@ -482,12 +585,12 @@ function buildPdfReport(stateSnapshot, summary, tradeSummary, targetBuyback) {
   <div class="sheet">
     <div class="head">
       <div>
-        <div class="eyebrow">Professional BTC Options Profit Analytics Engine</div>
+        <div class="eyebrow">Professional ${asset.symbol} Options Profit Analytics Engine</div>
         <h1>${reportTitle}</h1>
-        <div class="meta">Generated by BTC Option Selling Net Profit Calculator<br />Designed and developed by MD. Minaj Uddin</div>
+        <div class="meta">Generated by ${asset.title}<br />Designed and developed by MD. Minaj Uddin</div>
       </div>
       <div class="meta">
-        BTC Price: ${formatMoney(stateSnapshot.btcPrice)}<br />
+        ${asset.priceLabel}: ${formatMoney(stateSnapshot.btcPrice)}<br />
         Selling Price: ${formatMoney(stateSnapshot.sellingPrice)}<br />
         Buyback Price: ${stateSnapshot.buyingPrice == null ? 'Enter buyback price' : formatMoney(stateSnapshot.buyingPrice)}<br />
         Lots: ${stateSnapshot.lots}<br />
@@ -544,6 +647,7 @@ function animateLiveCards() {
 
 function updateUi() {
   const stateSnapshot = getTradeState();
+  const asset = getAssetConfig();
 
   if (!stateSnapshot.validInputs) {
     setValue(elements.grossProfit, '--');
@@ -567,7 +671,7 @@ function updateUi() {
     setValue(elements.premiumDecayCaptured, '--');
     elements.entryLogic.textContent = '--';
     elements.exitLogic.textContent = '--';
-    elements.statusMessage.textContent = 'Enter BTC price, selling price, lots, and leverage to calculate live results.';
+    elements.statusMessage.textContent = `Enter ${asset.priceLabel}, selling price, lots, and leverage to calculate live results.`;
     elements.roiBadge.textContent = 'Ready';
     elements.roiBadge.className = 'pill pill-positive';
     setActiveTargetButton(state.targetRoi);
@@ -624,7 +728,7 @@ function updateUi() {
   });
   setValue(elements.premiumDecayCaptured, formatPercent(tradeSummary.premiumDecayCaptured));
 
-  elements.entryLogic.textContent = `Entry Fee = MIN(Standard Fee, Premium Cap Fee) + GST | BTC price = ${formatMoney(stateSnapshot.btcPrice)} | Notional = ${formatMoney(summary.entry.notionalValue)} | Standard fee = ${formatMoney(summary.entry.standardTradingFee)} | Premium cap fee = ${formatMoney(summary.entry.premiumCapFee)} | Final fee after GST = ${formatMoney(summary.entry.finalFee)}`;
+  elements.entryLogic.textContent = `Entry Fee = MIN(Standard Fee, Premium Cap Fee) + GST | ${asset.priceLabel} = ${formatMoney(stateSnapshot.btcPrice)} | Notional = ${formatMoney(summary.entry.notionalValue)} | Standard fee = ${formatMoney(summary.entry.standardTradingFee)} | Premium cap fee = ${formatMoney(summary.entry.premiumCapFee)} | Final fee after GST = ${formatMoney(summary.entry.finalFee)}`;
 
   if (stateSnapshot.buyingPrice == null) {
     elements.exitLogic.textContent = 'Exit Fee = MIN(Standard Fee, Premium Cap Fee) + GST | Buyback price is optional. Enter a buyback price to see the exit fee, total charges, net profit, and ROI.';
@@ -636,7 +740,7 @@ function updateUi() {
     return;
   }
 
-  elements.exitLogic.textContent = `Exit Fee = MIN(Standard Fee, Premium Cap Fee) + GST | BTC price = ${formatMoney(stateSnapshot.btcPrice)} | Notional = ${formatMoney(summary.exit.notionalValue)} | Standard fee = ${formatMoney(summary.exit.standardTradingFee)} | Premium cap fee = ${formatMoney(summary.exit.premiumCapFee)} | Final fee after GST = ${formatMoney(summary.exit.finalFee)}`;
+  elements.exitLogic.textContent = `Exit Fee = MIN(Standard Fee, Premium Cap Fee) + GST | ${asset.priceLabel} = ${formatMoney(stateSnapshot.btcPrice)} | Notional = ${formatMoney(summary.exit.notionalValue)} | Standard fee = ${formatMoney(summary.exit.standardTradingFee)} | Premium cap fee = ${formatMoney(summary.exit.premiumCapFee)} | Final fee after GST = ${formatMoney(summary.exit.finalFee)}`;
   elements.statusMessage.textContent = 'Live trade results updated from your current inputs.';
 
   const positive = summary.netProfit != null && summary.netProfit > 0;
@@ -724,8 +828,9 @@ function buildCurrentPayload() {
 
 async function copyResults() {
   const payload = buildCurrentPayload();
+  const asset = getAssetConfig();
   const lines = [
-    'BTC Option Selling Net Profit Calculator',
+    asset.title,
     `Gross Profit: ${payload.summary.grossProfit == null ? 'Enter buyback price' : formatMoney(payload.summary.grossProfit)}`,
     `Entry Fee: ${formatMoney(payload.summary.entryFee)}`,
     `Exit Fee: ${payload.summary.exitFee == null ? 'Enter buyback price' : formatMoney(payload.summary.exitFee)}`,
@@ -760,7 +865,7 @@ function downloadBlob(filename, content, mimeType) {
 function exportCsv() {
   const payload = buildCurrentPayload();
   const csv = buildCsvRows(payload.stateSnapshot, payload.summary, payload.targetBuyback, payload.tradeSummary);
-  downloadBlob('btc-option-profit-report.csv', csv, 'text/csv;charset=utf-8;');
+  downloadBlob(`${getAssetConfig().symbol.toLowerCase()}-option-profit-report.csv`, csv, 'text/csv;charset=utf-8;');
   elements.statusMessage.textContent = 'CSV export downloaded.';
 }
 
@@ -772,11 +877,19 @@ function exportPdf() {
 
 function resetCalculator() {
   elements.form.reset();
-  elements.btcPrice.value = '100000';
+  elements.btcPrice.value = String(getAssetPriceValue());
   state.targetRoi = CONFIG.defaultTargetRoi;
+  setAsset(state.asset, { resetPrice: false });
   setActiveTargetButton(state.targetRoi);
   updateUi();
 }
+
+elements.assetToggleButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    setAsset(button.dataset.asset);
+    updateUi();
+  });
+});
 
 elements.form.addEventListener('input', updateUi);
 elements.resetBtn.addEventListener('click', resetCalculator);
@@ -820,4 +933,5 @@ requestAnimationFrame(() => {
 });
 
 setActiveTargetButton(state.targetRoi);
+setAsset(state.asset);
 updateUi();

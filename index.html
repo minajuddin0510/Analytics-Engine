@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BTC Option Selling Net Profit Calculator</title>
-  <meta name="description" content="Professional BTC option selling net profit calculator for Delta Exchange traders." />
+  <title>BTC Options Profit Analytics Engine</title>
+  <meta name="description" content="Professional analytics engine for crypto option sellers featuring exchange fee modelling, GST calculations, ROI targeting, buyback optimization, and profitability analysis." />
   <link rel="icon" type="image/jpeg" href="favicon.jpg" />
-  <meta property="og:title" content="BTC Option Selling Net Profit Calculator" />
-  <meta property="og:description" content="Professional BTC option selling net profit calculator for Delta Exchange traders." />
+  <meta property="og:title" content="BTC Options Profit Analytics Engine" />
+  <meta property="og:description" content="Professional analytics engine for crypto option sellers featuring exchange fee modelling, GST calculations, ROI targeting, buyback optimization, and profitability analysis." />
   <meta property="og:image" content="cover.jpg" />
   <meta property="og:type" content="website" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,17 +25,24 @@
       <div class="brand-row">
         <div class="title-block">
           <div class="hero-topline">
-            <span class="eyebrow">Delta Exchange BTC Option Selling</span>
+            <span id="assetEyebrow" class="eyebrow">Delta Exchange BTC Options</span>
             <div class="hero-badges">
               <span class="pill pill-live">LIVE FEE MODEL</span>
               <span class="pill pill-live">DELTA EXCHANGE LOGIC</span>
               <span class="pill pill-version">Version 2.0</span>
             </div>
           </div>
-          <h1>BTC Option Selling Net Profit Calculator</h1>
-          <p class="hero-subtitle">Professional BTC Options Profit Analytics Engine</p>
+          <div class="asset-row">
+            <div id="assetToggle" class="asset-toggle" role="tablist" aria-label="Asset selector">
+              <button type="button" class="asset-toggle-btn active" data-asset="btc" aria-pressed="true">BTC</button>
+              <button type="button" class="asset-toggle-btn" data-asset="eth" aria-pressed="false">ETH</button>
+            </div>
+            <span class="pill asset-support-badge">Supports BTC &amp; ETH Options</span>
+          </div>
+          <h1 id="assetTitle">BTC Options Profit Analytics Engine</h1>
+          <p id="heroSubtitle" class="hero-subtitle">Professional analytics engine for crypto option sellers featuring exchange fee modelling, GST calculations, ROI targeting, buyback optimization, and profitability analysis.</p>
           <p>
-            Live USD calculator for professional BTC option selling trades with hardcoded Delta Exchange fee logic,
+            Live USD calculator for professional crypto option selling trades with hardcoded Delta Exchange fee logic,
             GST, margin, ROI, and target buyback engine.
           </p>
         </div>
@@ -78,7 +85,7 @@
 
         <form id="calculatorForm" class="input-grid" novalidate>
           <label class="field">
-            <span>BTC Price</span>
+            <span id="assetPriceLabel">BTC Price</span>
             <input id="btcPrice" type="number" inputmode="decimal" min="0" step="0.01" placeholder="100000" value="100000" />
           </label>
 
@@ -115,7 +122,7 @@
         </div>
 
         <div class="constants-card">
-          <div><span>Lot Size</span><strong>0.001 BTC</strong></div>
+          <div><span>Lot Size</span><strong id="lotSizeValue">0.001 BTC</strong></div>
           <div><span>Maker Fee</span><strong>0.01%</strong></div>
           <div><span>Premium Cap</span><strong>3.5%</strong></div>
           <div><span>GST</span><strong>18%</strong></div>
@@ -227,7 +234,7 @@
       <details id="aboutProject" class="about-project">
         <summary>About This Project</summary>
         <div class="about-content">
-          <p>This application recreates Delta Exchange BTC option fee calculations and provides real-time profit analytics for option sellers.</p>
+          <p id="aboutProjectIntro">This application recreates Delta Exchange crypto option fee calculations and provides real-time profit analytics for option sellers.</p>
           <div class="about-columns">
             <div>
               <span>Features</span>
@@ -238,6 +245,11 @@
                 <li>Buyback optimization</li>
                 <li>Margin analytics</li>
                 <li>Trade journaling</li>
+              </ul>
+              <span>Supported Assets</span>
+              <ul>
+                <li>Bitcoin (BTC) Options</li>
+                <li>Ethereum (ETH) Options</li>
               </ul>
             </div>
             <div>

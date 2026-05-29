@@ -138,6 +138,54 @@ body::before {
   flex-wrap: wrap;
 }
 
+.asset-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.asset-toggle {
+  display: inline-flex;
+  padding: 4px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.asset-toggle-btn {
+  appearance: none;
+  border: 0;
+  border-radius: 14px;
+  padding: 10px 16px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  transition: background 180ms ease, color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.asset-toggle-btn:hover {
+  transform: translateY(-1px);
+}
+
+.asset-toggle-btn.active {
+  background: linear-gradient(135deg, rgba(88, 223, 255, 0.18), rgba(138, 108, 255, 0.16));
+  color: var(--text);
+  box-shadow: 0 10px 24px rgba(88, 223, 255, 0.12);
+}
+
+.asset-support-badge {
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(238, 243, 255, 0.82);
+  background: rgba(255, 255, 255, 0.05);
+}
+
 .eyebrow {
   display: inline-flex;
   padding: 8px 12px;
