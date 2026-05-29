@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BTC Option Selling Net Profit Calculator</title>
+  <meta name="description" content="Professional BTC option selling net profit calculator for Delta Exchange traders." />
+  <link rel="icon" type="image/jpeg" href="favicon.jpg" />
+  <meta property="og:title" content="BTC Option Selling Net Profit Calculator" />
+  <meta property="og:description" content="Professional BTC option selling net profit calculator for Delta Exchange traders." />
+  <meta property="og:image" content="cover.jpg" />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-grid"></div>
+
+  <main class="app-shell">
+    <section class="hero-card glass">
+      <div class="brand-row">
+        <div class="title-block">
+          <div class="hero-topline">
+            <span class="eyebrow">Delta Exchange BTC Option Selling</span>
+            <div class="hero-badges">
+              <span class="pill pill-live">LIVE FEE MODEL</span>
+              <span class="pill pill-live">DELTA EXCHANGE LOGIC</span>
+              <span class="pill pill-version">Version 2.0</span>
+            </div>
+          </div>
+          <h1>BTC Option Selling Net Profit Calculator</h1>
+          <p class="hero-subtitle">Professional BTC Options Profit Analytics Engine</p>
+          <p>
+            Live USD calculator for professional BTC option selling trades with hardcoded Delta Exchange fee logic,
+            GST, margin, ROI, and target buyback engine.
+          </p>
+        </div>
+
+        <div class="brand-box">
+          <img src="logo.jpg" alt="Minaj Enterprises logo" class="brand-logo" />
+          <div>
+            <div class="brand-name">Minaj Enterprises</div>
+            <div class="brand-tag">A Product of Minaj Enterprises</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="target-strip glass">
+      <div class="section-head-inline">
+        <div>
+          <h2>Target ROI Engine</h2>
+          <p>Instantly solve the exact buyback price for a chosen net return target.</p>
+        </div>
+        <div class="keyboard-hints">Keyboard: Alt+C copy journal · Alt+P export PDF · Alt+S export CSV</div>
+      </div>
+      <div id="targetButtons" class="target-buttons" role="group" aria-label="Target ROI presets">
+        <button type="button" class="target-btn" data-target-roi="1">1%</button>
+        <button type="button" class="target-btn" data-target-roi="2">2%</button>
+        <button type="button" class="target-btn" data-target-roi="3">3%</button>
+        <button type="button" class="target-btn active" data-target-roi="5">5%</button>
+        <button type="button" class="target-btn" data-target-roi="10">10%</button>
+        <button type="button" class="target-btn" data-target-roi="15">15%</button>
+        <button type="button" class="target-btn" data-target-roi="20">20%</button>
+      </div>
+    </section>
+
+    <section class="content-grid">
+      <article class="panel glass inputs-panel">
+        <div class="panel-head">
+          <h2>Trade Inputs</h2>
+          <span class="pill">USD only</span>
+        </div>
+
+        <form id="calculatorForm" class="input-grid" novalidate>
+          <label class="field">
+            <span>BTC Price</span>
+            <input id="btcPrice" type="number" inputmode="decimal" min="0" step="0.01" placeholder="100000" value="100000" />
+          </label>
+
+          <label class="field">
+            <span>Selling Price</span>
+            <input id="sellingPrice" type="number" inputmode="decimal" min="0" step="0.01" placeholder="45" />
+          </label>
+
+          <label class="field">
+            <span>Buying Price <small>(optional)</small></span>
+            <input id="buyingPrice" type="number" inputmode="decimal" min="0" step="0.01" placeholder="40" />
+          </label>
+
+          <label class="field">
+            <span>Lots</span>
+            <input id="lots" type="number" inputmode="numeric" min="1" step="1" placeholder="250" />
+          </label>
+
+          <label class="field">
+            <span>Leverage</span>
+            <input id="leverage" type="number" inputmode="decimal" min="1" step="0.1" placeholder="10" />
+          </label>
+        </form>
+
+        <div class="action-row">
+          <button id="resetBtn" type="button" class="btn btn-secondary">Reset</button>
+          <button id="copyBtn" type="button" class="btn btn-primary">Copy Results</button>
+        </div>
+
+        <div class="export-row">
+          <button id="copyJournalBtn" type="button" class="btn btn-secondary">Copy Trade Journal</button>
+          <button id="exportPdfBtn" type="button" class="btn btn-secondary">Export PDF</button>
+          <button id="exportCsvBtn" type="button" class="btn btn-secondary">Export CSV</button>
+        </div>
+
+        <div class="constants-card">
+          <div><span>Lot Size</span><strong>0.001 BTC</strong></div>
+          <div><span>Maker Fee</span><strong>0.01%</strong></div>
+          <div><span>Premium Cap</span><strong>3.5%</strong></div>
+          <div><span>GST</span><strong>18%</strong></div>
+        </div>
+
+        <div id="statusMessage" class="status-message">Enter trade details to begin.</div>
+      </article>
+
+      <article class="panel glass results-panel">
+        <div class="panel-head">
+          <h2>Live Results</h2>
+          <span id="roiBadge" class="pill pill-positive">Ready</span>
+        </div>
+
+        <div class="result-stack">
+          <div class="result-card roi-card loading-card">
+            <span>ROI (Net)</span>
+            <strong id="roiPercent">--</strong>
+            <small id="roiDetail">Target net return focused on trade margin usage.</small>
+          </div>
+          <div class="result-card accent-card loading-card">
+            <span id="targetBuybackLabel">Exact Buyback Price for NET 5%</span>
+            <strong id="targetBuyback">--</strong>
+          </div>
+          <div class="result-card loading-card">
+            <span>Gross Profit</span>
+            <strong id="grossProfit">--</strong>
+          </div>
+          <div class="result-card loading-card">
+            <span>Entry Fee</span>
+            <strong id="entryFee">--</strong>
+          </div>
+          <div class="result-card loading-card">
+            <span>Exit Fee</span>
+            <strong id="exitFee">--</strong>
+          </div>
+          <div class="result-card loading-card">
+            <span>Total Charges</span>
+            <strong id="totalCharges">--</strong>
+          </div>
+          <div class="result-card loading-card">
+            <span>Net Profit</span>
+            <strong id="netProfit">--</strong>
+          </div>
+          <div class="result-card loading-card">
+            <span>Margin Used</span>
+            <strong id="marginUsed">--</strong>
+          </div>
+        </div>
+
+        <div class="trade-summary glass-subcard loading-card">
+          <div class="panel-head compact-head">
+            <h2>Trade Summary</h2>
+            <button id="copyJournalBtnSecondary" type="button" class="btn btn-secondary compact-btn">Copy Trade Journal</button>
+          </div>
+          <div class="summary-grid">
+            <div><span>Capital Used</span><strong id="capitalUsed">--</strong></div>
+            <div><span>Gross Profit</span><strong id="summaryGrossProfit">--</strong></div>
+            <div><span>Total Charges</span><strong id="summaryTotalCharges">--</strong></div>
+            <div><span>Net Profit</span><strong id="summaryNetProfit">--</strong></div>
+            <div><span>Net ROI</span><strong id="summaryNetRoi">--</strong></div>
+            <div><span>Target Buyback</span><strong id="summaryTargetBuyback">--</strong></div>
+          </div>
+        </div>
+
+        <div class="advanced-metrics glass-subcard loading-card">
+          <div class="panel-head compact-head">
+            <h2>Advanced Trade Metrics</h2>
+            <span class="pill">Analytical view</span>
+          </div>
+          <div class="metrics-grid">
+            <div class="metric-item">
+              <div class="metric-label">Profit Per Lot <button class="metric-tip" type="button" title="Gross profit divided by the number of lots.">?</button></div>
+              <strong id="profitPerLot">--</strong>
+            </div>
+            <div class="metric-item">
+              <div class="metric-label">Fee Per Lot <button class="metric-tip" type="button" title="Total charges divided by the number of lots.">?</button></div>
+              <strong id="feePerLot">--</strong>
+            </div>
+            <div class="metric-item">
+              <div class="metric-label">Net Profit Per Lot <button class="metric-tip" type="button" title="Net profit divided by the number of lots.">?</button></div>
+              <strong id="netProfitPerLot">--</strong>
+            </div>
+            <div class="metric-item">
+              <div class="metric-label">Capital Efficiency <button class="metric-tip" type="button" title="Net profit as a percentage of capital used.">?</button></div>
+              <strong id="capitalEfficiency">--</strong>
+            </div>
+            <div class="metric-item">
+              <div class="metric-label">Premium Decay Captured (%) <button class="metric-tip" type="button" title="Gross profit expressed as a percentage of the option premium sold.">?</button></div>
+              <strong id="premiumDecayCaptured">--</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="fee-breakdown">
+          <div>
+            <span>Entry Fee Formula</span>
+            <p id="entryLogic">--</p>
+          </div>
+          <div>
+            <span>Exit Fee Formula</span>
+            <p id="exitLogic">--</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="portfolio-section glass">
+      <details id="aboutProject" class="about-project">
+        <summary>About This Project</summary>
+        <div class="about-content">
+          <p>This application recreates Delta Exchange BTC option fee calculations and provides real-time profit analytics for option sellers.</p>
+          <div class="about-columns">
+            <div>
+              <span>Features</span>
+              <ul>
+                <li>Exchange fee modelling</li>
+                <li>GST calculations</li>
+                <li>Net ROI targeting</li>
+                <li>Buyback optimization</li>
+                <li>Margin analytics</li>
+                <li>Trade journaling</li>
+              </ul>
+            </div>
+            <div>
+              <span>Built with</span>
+              <ul>
+                <li>HTML</li>
+                <li>CSS</li>
+                <li>JavaScript</li>
+              </ul>
+            </div>
+          </div>
+          <p class="about-credit">Designed and developed by MD. Minaj Uddin</p>
+        </div>
+      </details>
+    </section>
+
+    <section class="disclaimer glass">
+      <p>“This tool is independently built for analytical purposes and is not officially affiliated with Delta Exchange.”</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>© 2026 Minaj Enterprises. All Rights Reserved.</p>
+    <p>Built for Professional Crypto Derivatives Traders</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
